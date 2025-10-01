@@ -1,0 +1,8 @@
+{
+  // 이 프로젝트에서는 저장 시 자동 포맷을 켭니다.
+  "editor.formatOnSave": true,
+
+  // 이 프로젝트의 기본 포맷터로 Prettier를 사용합니다.
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "postman.settings.dotenv-detection-notification-visibility": false
+}

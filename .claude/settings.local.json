@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run start:dev:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm install:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npm run lint:*)",
+      "Bash(npx prettier:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"console.log(Object.keys(require(''@prisma/client'')))\")",
+      "Bash(node:*)",
+      "Bash(cat:*)",
+      "Bash(npx nest g resource:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

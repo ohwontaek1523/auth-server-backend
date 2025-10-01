@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["auth"]
+}
+
+model User {
+  userId            String              @id(map: "users_pkey") @default(dbgenerated("gen_random_uuid()")) @map("user_id") @db.Uuid
+  nickname          String              @db.VarChar(50)
+  email             String              @unique(map: "users_email_key") @db.VarChar(255)
+  profileImageUrl   String?             @map("profile_image_url")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @default(now()) @map("updated_at")
+  password          String?             @db.VarChar(255)
+  refreshToken      String?             @map("refresh_token")
+  userSocialAccount UserSocialAccount[]
+
+  @@map("user")
+  @@schema("auth")
+}
+
+model UserSocialAccount {
+  userSocialAccountId String   @id(map: "user_social_accounts_pkey") @default(dbgenerated("gen_random_uuid()")) @map("user_social_account_id") @db.Uuid
+  userId              String   @map("user_id") @db.Uuid
+  provider            String   @db.VarChar(50)
+  providerId          String   @map("provider_id")
+  createdAt           DateTime @default(now()) @map("created_at")
+  user                User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "user_social_accounts_user_id_fkey")
+
+  @@unique([provider, providerId], map: "user_social_accounts_provider_provider_id_unique")
+  @@index([userId], map: "user_social_accounts_user_id_idx")
+  @@map("user_social_account")
+  @@schema("auth")
+}

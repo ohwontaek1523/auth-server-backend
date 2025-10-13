@@ -5,12 +5,21 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { ConfigService } from '@nestjs/config';
 
 interface RequestWithUser extends ExpressRequest {
   user: {
     userId: string;
     email: string;
+  };
+}
+
+interface RequestWithRefreshToken extends ExpressRequest {
+  user: {
+    userId: string;
+    email: string;
+    refreshToken: string;
   };
 }
 
@@ -70,14 +79,34 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @UseGuards(JwtRefreshGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Access Token 재발급' })
   @ApiResponse({ status: 200, description: '토큰 재발급 성공' })
   @ApiResponse({ status: 401, description: 'Refresh Token이 유효하지 않음' })
-  async refresh(@Request() req: RequestWithUser, @Body('refreshToken') refreshToken: string) {
-    return this.authService.refreshTokens(req.user.userId, refreshToken);
+  async refresh(@Request() req: RequestWithRefreshToken, @Res({ passthrough: true }) res: Response) {
+    const tokens = await this.authService.refreshTokensFromCookie(req.user.userId, req.user.refreshToken);
+
+    const accessTokenName = this.configService.get<string>('COOKIE_ACCESS_TOKEN_NAME') || 'owt_access_token';
+    const refreshTokenName = this.configService.get<string>('COOKIE_REFRESH_TOKEN_NAME') || 'owt_refresh_token';
+
+    // 새 Access Token 쿠키 설정
+    res.cookie(accessTokenName, tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15분
+    });
+
+    // 새 Refresh Token 쿠키 설정 (보안을 위해 Refresh Token도 갱신)
+    res.cookie(refreshTokenName, tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+    });
+
+    return tokens;
   }
 
   @Post('logout')

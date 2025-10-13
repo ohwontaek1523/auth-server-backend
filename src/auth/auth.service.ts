@@ -159,4 +159,27 @@ export class AuthService {
 
     return user;
   }
+
+  async refreshTokensFromCookie(userId: string, refreshToken: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { userId },
+    });
+
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException('접근이 거부되었습니다');
+    }
+
+    // DB에 저장된 해시와 쿠키의 Refresh Token 비교
+    const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
+
+    if (!refreshTokenMatches) {
+      throw new UnauthorizedException('접근이 거부되었습니다');
+    }
+
+    // 새 토큰 발급
+    const tokens = await this.generateTokens(user.userId, user.email);
+    await this.updateRefreshToken(user.userId, tokens.refreshToken);
+
+    return tokens;
+  }
 }

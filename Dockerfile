@@ -37,8 +37,11 @@ RUN npx prisma generate
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy environment file
+COPY .env.production .env.production
+
 # Expose port
 EXPOSE 3000
 
-# Start application
-CMD ["node", "dist/main"]
+# Start application using npm script (uses dotenv-cli)
+CMD ["npm", "run", "start:prod"]

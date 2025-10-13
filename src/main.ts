@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   //app.setGlobalPrefix('api'); //
 
-  // 쿠키 파서 미들웨어
+  // 쿠키 파서 미들웨어!
   app.use(cookieParser());
 
   // 전역 파이프 설정

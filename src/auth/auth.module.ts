@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { NaverStrategy } from './strategies/naver.strategy';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtStrategy, JwtRefreshStrategy],
+  providers: [AuthService, PrismaService, JwtStrategy, JwtRefreshStrategy, NaverStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -182,4 +182,59 @@ export class AuthService {
 
     return tokens;
   }
+
+  async loginWithOAuth(oauthUser: {
+    email: string;
+    nickname: string;
+    profileImageUrl?: string;
+    provider: string;
+    providerId: string;
+  }) {
+    // 1. 소셜 계정 정보로 기존 회원 찾기
+    const socialAccount = await this.prisma.userSocialAccount.findUnique({
+      where: {
+        provider_providerId: {
+          provider: oauthUser.provider,
+          providerId: oauthUser.providerId,
+        },
+      },
+      include: { user: true },
+    });
+
+    let user;
+
+    if (socialAccount) {
+      // 2-1. 기존 회원
+      user = socialAccount.user;
+    } else {
+      // 2-2. 신규 회원 → User + UserSocialAccount 동시 생성
+      user = await this.prisma.user.create({
+        data: {
+          email: oauthUser.email,
+          nickname: oauthUser.nickname,
+          profileImageUrl: oauthUser.profileImageUrl,
+          password: null, // 소셜 로그인은 비밀번호 없음
+          userSocialAccount: {
+            create: {
+              provider: oauthUser.provider,
+              providerId: oauthUser.providerId,
+            },
+          },
+        },
+      });
+    }
+
+    // 3. JWT 토큰 생성
+    const tokens = await this.generateTokens(user.userId, user.email);
+
+    // 4. Refresh Token DB에 저장
+    await this.updateRefreshToken(user.userId, tokens.refreshToken);
+
+    return {
+      userId: user.userId,
+      email: user.email,
+      nickname: user.nickname,
+      ...tokens,
+    };
+  }
 }

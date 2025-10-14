@@ -17,7 +17,9 @@
       "Bash(node -e \"console.log(Object.keys(require(''@prisma/client'')))\")",
       "Bash(node:*)",
       "Bash(cat:*)",
-      "Bash(npx nest g resource:*)"
+      "Bash(npx nest g resource:*)",
+      "Bash(if not exist \".vscode\" mkdir .vscode)",
+      "Bash(cmd /c:*)"
     ],
     "deny": [],
     "ask": []

@@ -21,10 +21,12 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
       clientSecret,
       callbackURL,
       scope: ['email', 'profile'],
+      passReqToCallback: true, // req를 validate에 전달
     });
   }
 
   async validate(
+    req: any,
     accessToken: string,
     refreshToken: string,
     profile: any,
@@ -52,6 +54,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
         profileImageUrl: user.profile_image,
         provider: 'naver',
         providerId: user.id,
+        redirectUrl: req.query.state, // state에서 원본 URL 복원
       };
 
       done(null, payload);

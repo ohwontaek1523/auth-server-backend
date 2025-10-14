@@ -77,28 +77,6 @@ export class AuthController {
     });
   }
 
-  private getRedirectUrl(req: any): string {
-    const referer = req.headers.referer || req.headers.origin;
-
-    console.log('=== getRedirectUrl Debug ===');
-    console.log('referer:', referer);
-    console.log('origin:', req.headers.origin);
-    console.log('allowedOrigins:', this.allowedOrigins);
-    console.log('all headers:', req.headers);
-
-    if (referer) {
-      const matchedOrigin = this.allowedOrigins.find(origin =>
-        referer.startsWith(origin)
-      );
-      console.log('matchedOrigin:', matchedOrigin);
-      if (matchedOrigin) {
-        return matchedOrigin;
-      }
-    }
-
-    console.log('No match, returning default:', this.allowedOrigins[0]);
-    return this.allowedOrigins[0];
-  }
 
   @Post('signup')
   @ApiOperation({ summary: '회원가입' })
@@ -190,7 +168,12 @@ export class AuthController {
     const tokens = await this.authService.loginWithOAuth(req.user);
     this.setAuthCookies(res, tokens);
 
-    const redirectUrl = this.getRedirectUrl(req);
+    // state에서 원본 URL 가져오기
+    const redirectUrl = req.user.redirectUrl || this.allowedOrigins[0];
+
+    console.log('=== Redirect Debug ===');
+    console.log('redirectUrl from state:', redirectUrl);
+
     res.redirect(redirectUrl);
   }
 }

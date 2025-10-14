@@ -80,15 +80,23 @@ export class AuthController {
   private getRedirectUrl(req: any): string {
     const referer = req.headers.referer || req.headers.origin;
 
+    console.log('=== getRedirectUrl Debug ===');
+    console.log('referer:', referer);
+    console.log('origin:', req.headers.origin);
+    console.log('allowedOrigins:', this.allowedOrigins);
+    console.log('all headers:', req.headers);
+
     if (referer) {
       const matchedOrigin = this.allowedOrigins.find(origin =>
         referer.startsWith(origin)
       );
+      console.log('matchedOrigin:', matchedOrigin);
       if (matchedOrigin) {
         return matchedOrigin;
       }
     }
 
+    console.log('No match, returning default:', this.allowedOrigins[0]);
     return this.allowedOrigins[0];
   }
 

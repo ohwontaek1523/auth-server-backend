@@ -48,14 +48,20 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
 
       const user = data.response;
 
+      console.log('=== NaverStrategy validate Debug ===');
+      console.log('req.cookies:', req.cookies);
+      console.log('redirectUrl from cookie:', req.cookies?.oauth_redirect_url);
+
       const payload = {
         email: user.email,
         nickname: user.nickname || user.name,
         profileImageUrl: user.profile_image,
         provider: 'naver',
         providerId: user.id,
-        redirectUrl: req.query.state, // state에서 원본 URL 복원
+        redirectUrl: req.cookies?.oauth_redirect_url, // 쿠키에서 원본 URL 복원
       };
+
+      console.log('payload.redirectUrl:', payload.redirectUrl);
 
       done(null, payload);
     } catch (error) {

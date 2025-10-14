@@ -168,11 +168,14 @@ export class AuthController {
     const tokens = await this.authService.loginWithOAuth(req.user);
     this.setAuthCookies(res, tokens);
 
-    // state에서 원본 URL 가져오기
+    // 쿠키에서 원본 URL 가져오기
     const redirectUrl = req.user.redirectUrl || this.allowedOrigins[0];
 
     console.log('=== Redirect Debug ===');
-    console.log('redirectUrl from state:', redirectUrl);
+    console.log('redirectUrl from user:', redirectUrl);
+
+    // OAuth 리다이렉트 쿠키 삭제
+    res.clearCookie('oauth_redirect_url');
 
     res.redirect(redirectUrl);
   }

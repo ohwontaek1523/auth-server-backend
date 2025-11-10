@@ -10,7 +10,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
       envFilePath: [
         `.env.${process.env.NODE_ENV}`, //우선
-        '.env', // 최종 백업
+        '.env', // 최종 백업//
       ],
     }),
     PrismaModule,

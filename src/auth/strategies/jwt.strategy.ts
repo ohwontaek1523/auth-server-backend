@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
-
+//
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
@@ -12,7 +12,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new Error('JWT_SECRET is not defined in environment variables');
     }
 
-    const accessTokenName = configService.get<string>('COOKIE_ACCESS_TOKEN_NAME') || 'owt_access_token';
+    const accessTokenName =
+      configService.get<string>('COOKIE_ACCESS_TOKEN_NAME') ||
+      'owt_access_token';
 
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
